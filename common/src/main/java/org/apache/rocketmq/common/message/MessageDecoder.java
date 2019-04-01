@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MessageDecoder {
+    //消息ID有16个字节，组成是4字节IP+4字节端口号+8字节消息偏移量
     public final static int MSG_ID_LENGTH = 8 + 8;
 
     public final static Charset CHARSET_UTF8 = Charset.forName("UTF-8");
@@ -43,27 +44,29 @@ public class MessageDecoder {
     public static final char PROPERTY_SEPARATOR = 2;
     public static final int PHY_POS_POSITION =  4 + 4 + 4 + 4 + 4 + 8;
     public static final int BODY_SIZE_POSITION = 4 // 1 TOTALSIZE
-        + 4 // 2 MAGICCODE
-        + 4 // 3 BODYCRC
-        + 4 // 4 QUEUEID
-        + 4 // 5 FLAG
-        + 8 // 6 QUEUEOFFSET
-        + 8 // 7 PHYSICALOFFSET
-        + 4 // 8 SYSFLAG
-        + 8 // 9 BORNTIMESTAMP
-        + 8 // 10 BORNHOST
-        + 8 // 11 STORETIMESTAMP
-        + 8 // 12 STOREHOSTADDRESS
-        + 4 // 13 RECONSUMETIMES
-        + 8; // 14 Prepared Transaction Offset
+            + 4 // 2 MAGICCODE
+            + 4 // 3 BODYCRC
+            + 4 // 4 QUEUEID
+            + 4 // 5 FLAG
+            + 8 // 6 QUEUEOFFSET
+            + 8 // 7 PHYSICALOFFSET
+            + 4 // 8 SYSFLAG
+            + 8 // 9 BORNTIMESTAMP
+            + 8 // 10 BORNHOST
+            + 8 // 11 STORETIMESTAMP
+            + 8 // 12 STOREHOSTADDRESS
+            + 4 // 13 RECONSUMETIMES
+            + 8; // 14 Prepared Transaction Offset
 
     public static String createMessageId(final ByteBuffer input, final ByteBuffer addr, final long offset) {
         input.flip();
+        //消息ID有16个字节，组成是4字节IP+4字节端口号+8字节消息偏移量
         input.limit(MessageDecoder.MSG_ID_LENGTH);
 
         input.put(addr);
         input.putLong(offset);
 
+        //使用UtilAll.bytes2string将msgId字节数组转换成字符串
         return UtilAll.bytes2string(input.array());
     }
 
@@ -421,6 +424,7 @@ public class MessageDecoder {
         //note properties length must not more than Short.MAX
         short propertiesLength = (short) propertiesBytes.length;
         int sysFlag = message.getFlag();
+        //RoctetMQ批量消息封装格式
         int storeSize = 4 // 1 TOTALSIZE
             + 4 // 2 MAGICCOD
             + 4 // 3 BODYCRC

@@ -35,16 +35,16 @@ public class MappedFileQueue {
 
     private static final int DELETE_FILES_BATCH_MAX = 10;
 
-    private final String storePath;
+    private final String storePath;//存储目录
 
-    private final int mappedFileSize;
+    private final int mappedFileSize;//单个文件的存储大小
 
-    private final CopyOnWriteArrayList<MappedFile> mappedFiles = new CopyOnWriteArrayList<MappedFile>();
+    private final CopyOnWriteArrayList<MappedFile> mappedFiles = new CopyOnWriteArrayList<MappedFile>();//MappedFile文件集合
 
-    private final AllocateMappedFileService allocateMappedFileService;
+    private final AllocateMappedFileService allocateMappedFileService;//创建MappedFile服务类
 
-    private long flushedWhere = 0;
-    private long committedWhere = 0;
+    private long flushedWhere = 0;//当前刷盘指针，该指针之前的所有数据持久化到磁盘
+    private long committedWhere = 0;//当前数据提交指针，内存中ByteBuffer当前的写指针，该值大于等于flushedWhere
 
     private volatile long storeTimestamp = 0;
 
@@ -80,6 +80,8 @@ public class MappedFileQueue {
         if (null == mfs)
             return null;
 
+        //根据消息存储时间戳来查找MappedFile，从MappedFile列表中第一个文件开始查找，找到第一个最后一次更新时间大于待查找时间戳的文件，
+        //如果不存在，则返回最后一个MappedFile文件
         for (int i = 0; i < mfs.length; i++) {
             MappedFile mappedFile = (MappedFile) mfs[i];
             if (mappedFile.getLastModifiedTimestamp() >= timestamp) {
@@ -106,12 +108,15 @@ public class MappedFileQueue {
 
         for (MappedFile file : this.mappedFiles) {
             long fileTailOffset = file.getFileFromOffset() + this.mappedFileSize;
+            //删除offset之后的所有文件，遍历目录下的所有文件，如果文件的尾部偏移量小于offset则跳过该文件
             if (fileTailOffset > offset) {
+                //如果尾部的偏移量大于offset，则进一步比较offset与文件的开始偏移量，如果offset大于文件的起始偏移量，说明当前文件包含了有效偏移量，设置指针
                 if (offset >= file.getFileFromOffset()) {
                     file.setWrotePosition((int) (offset % this.mappedFileSize));
                     file.setCommittedPosition((int) (offset % this.mappedFileSize));
                     file.setFlushedPosition((int) (offset % this.mappedFileSize));
                 } else {
+                    //如果offset小于文件的起始偏移量，说明该文件时有效文件后面创建的，然后加到待删除的文件列表中，最终调用deleteExpiredFile将文件从物理磁盘删除
                     file.destroy(1000);
                     willRemoveFiles.add(file);
                 }
@@ -144,6 +149,7 @@ public class MappedFileQueue {
         }
     }
 
+    //加载Commitlog文件，加载${ROCKET_HOME}/store/commitlog目录下所有文件并按照文件名排序
     public boolean load() {
         File dir = new File(this.storePath);
         File[] files = dir.listFiles();
@@ -159,6 +165,7 @@ public class MappedFileQueue {
                 }
 
                 try {
+                    //创建MappedFile，load方法将wrotePostion，flushedPosition，commitedPosition三个指针都设为文件大小
                     MappedFile mappedFile = new MappedFile(file.getPath(), mappedFileSize);
 
                     mappedFile.setWrotePosition(this.mappedFileSize);
@@ -285,6 +292,7 @@ public class MappedFileQueue {
         return true;
     }
 
+    //获取存储文件的最小偏移量
     public long getMinOffset() {
 
         if (!this.mappedFiles.isEmpty()) {
@@ -299,6 +307,7 @@ public class MappedFileQueue {
         return -1;
     }
 
+    //获取存储文件的最大偏移量，即返回最后一个MappedFile的fileFromOffset加上MappedFile文件当前的写指针
     public long getMaxOffset() {
         MappedFile mappedFile = getLastMappedFile();
         if (mappedFile != null) {
@@ -333,6 +342,7 @@ public class MappedFileQueue {
         }
     }
 
+    //执行文件销毁与删除。从倒数第二个文件开始遍历，计算文件的最大存货时间（即文件的最后一次更新时间+文件存活时间）
     public int deleteExpiredFileByTime(final long expiredTime,
         final int deleteFilesInterval,
         final long intervalForcibly,
@@ -472,6 +482,8 @@ public class MappedFileQueue {
                         this.mappedFileSize,
                         this.mappedFiles.size());
                 } else {
+                    //RocketMQ采取定时删除存储文件的策略，所以根据offset定位MappedFile的算法，减轻内存压力与资源浪费
+                    //由于使用内存映射，只要存在与存储目录下的文件，都需要创建对应内存映射文件，如果不定时从存储文件删除已消费的消息会造成极大内存压力
                     int index = (int) ((offset / this.mappedFileSize) - (firstMappedFile.getFileFromOffset() / this.mappedFileSize));
                     MappedFile targetFile = null;
                     try {

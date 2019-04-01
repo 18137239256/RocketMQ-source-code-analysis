@@ -866,6 +866,7 @@ public class BrokerController {
             @Override
             public void run() {
                 try {
+                    // 注册所有broker
                     BrokerController.this.registerBrokerAll(true, false, brokerConfig.isForceRegister());
                 } catch (Throwable e) {
                     log.error("registerBrokerAll Exception", e);

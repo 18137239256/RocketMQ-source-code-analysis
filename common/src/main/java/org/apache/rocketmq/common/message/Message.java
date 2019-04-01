@@ -43,12 +43,15 @@ public class Message implements Serializable {
         this.flag = flag;
         this.body = body;
 
+        //tags,消息TAG,用于消息过滤
         if (tags != null && tags.length() > 0)
             this.setTags(tags);
 
+        //keys,Message索引键，多个用空格隔开，RocketMQ根据这些key快速检索到消息
         if (keys != null && keys.length() > 0)
             this.setKeys(keys);
 
+        //waitStoreMsgOK,消息发送时是否等消息存储完成后再返回
         this.setWaitStoreMsgOK(waitStoreMsgOK);
     }
 
@@ -145,6 +148,7 @@ public class Message implements Serializable {
         return 0;
     }
 
+    // delayTimeLevel,消息延迟级别，用于定时消息或消息重试
     public void setDelayTimeLevel(int level) {
         this.putProperty(MessageConst.PROPERTY_DELAY_TIME_LEVEL, String.valueOf(level));
     }

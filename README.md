@@ -1,53 +1,20 @@
-## Apache RocketMQ [![Build Status](https://travis-ci.org/apache/rocketmq.svg?branch=master)](https://travis-ci.org/apache/rocketmq) [![Coverage Status](https://coveralls.io/repos/github/apache/rocketmq/badge.svg?branch=master)](https://coveralls.io/github/apache/rocketmq?branch=master)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.rocketmq/rocketmq-all/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Corg.apache.rocketmq)
-[![GitHub release](https://img.shields.io/badge/release-download-orange.svg)](https://rocketmq.apache.org/dowloading/releases)
-[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
+RocketMQ设计基于主题的发布与订阅模式，其核心功能包括消息发送、消息存储、消息消费，整体设计追求简单和性能至上。  
+其功能有顺序消息，消息过滤，消息存储，消息高可用，消息消费低延迟，消息保证至少消费一次，消息回溯，消息堆积，消  
+息定时消费，消息重试机制，是一款非常卓越的消息中间件，基于此，本项目在基于丁威老师的书RocketMQ技术内幕的基础  
+上，在Apache RocketMQ项目上添加相应的代码注释，以飨各位开发者。
+已完成的部分有：  
+RocketMQ路由中心NameServer  
+RocketMQ消息发送  
+RocketMQ消息存储  
+待完成部分有：  
+RocketMQ消息消费  
+消息过滤FilterServer  
+RocketMQ主从同步机制  
+RocketMQ事务消息  
 
-**[Apache RocketMQ](https://rocketmq.apache.org) is a distributed messaging and streaming platform with low latency, high performance and reliability, trillion-level capacity and flexible scalability.**
+丁威老师的RocketMQ技术内幕购买连接如下，请大家购买他的书籍表示支持  
+[京东](https://search.jd.com/Search?keyword=rocketmq%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95&enc=utf-8&suggest=1.def.0.V00--12,20,&wq=rocketmq&pvid=895bc55e69654613ac4423d607af5c7c)  
+[亚马逊](https://www.amazon.cn/s?k=RocketMQ%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95&__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&ref=nb_sb_noss)
 
-It offers a variety of features:
-
-* Pub/Sub messaging model
-* Scheduled message delivery
-* Message retroactivity by time or offset
-* Log hub for streaming
-* Big data integration
-* Reliable FIFO and strict ordered messaging in the same queue
-* Efficient pull&push consumption model
-* Million-level message accumulation capacity in a single queue
-* Multiple messaging protocols like JMS and OpenMessaging
-* Flexible distributed scale-out deployment architecture
-* Lightning-fast batch message exchange system
-* Various message filter mechanics such as SQL and Tag
-* Docker images for isolated testing and cloud isolated clusters
-* Feature-rich administrative dashboard for configuration, metrics and monitoring
-* Access control list
-* Message trace
-
-
-----------
-
-## Learn it & Contact us
-* Mailing Lists: <https://rocketmq.apache.org/about/contact/>
-* Home: <https://rocketmq.apache.org>
-* Docs: <https://rocketmq.apache.org/docs/quick-start/>
-* Issues: <https://github.com/apache/rocketmq/issues>
-* Rips: <https://github.com/apache/rocketmq/wiki/RocketMQ-Improvement-Proposal>
-* Ask: <https://stackoverflow.com/questions/tagged/rocketmq>
-* Slack: <https://rocketmq-invite-automation.herokuapp.com/>
- 
-
-----------
-
-## Apache RocketMQ Community
-* [RocketMQ Community Projects](https://github.com/apache/rocketmq-externals)
-----------
-
-## Contributing
-We always welcome new contributions, whether for trivial cleanups, [big new features](https://github.com/apache/rocketmq/wiki/RocketMQ-Improvement-Proposal) or other material rewards, more details see [here](http://rocketmq.apache.org/docs/how-to-contribute/).
- 
-----------
-## License
-[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) Copyright (C) Apache Software Foundation
-
-
+如果要进一步学习，也可以访问丁威老师的博客：唯有坚持不懈:<https://me.csdn.net/prestigeding>  
+或者加入钉钉群：21791227

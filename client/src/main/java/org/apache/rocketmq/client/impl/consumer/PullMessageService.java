@@ -76,6 +76,7 @@ public class PullMessageService extends ServiceThread {
         return scheduledExecutorService;
     }
 
+    //根据消费组名从MQClientInstance中获取消费者内部实现类MQConsuemerInner
     private void pullMessage(final PullRequest pullRequest) {
         final MQConsumerInner consumer = this.mQClientFactory.selectConsumer(pullRequest.getConsumerGroup());
         if (consumer != null) {

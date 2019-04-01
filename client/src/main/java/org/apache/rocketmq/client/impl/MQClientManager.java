@@ -44,7 +44,10 @@ public class MQClientManager {
         return getAndCreateMQClientInstance(clientConfig, null);
     }
 
+    //创建MQClientInstance实例，整个JVM实例中只存在一个MQClientManager实例，维护一个MQclientInstance缓存表factoryTable，即同一个clientId只创建一个MQClientInstance
     public MQClientInstance getAndCreateMQClientInstance(final ClientConfig clientConfig, RPCHook rpcHook) {
+        //为了避免clientId(格式：IP@instance(@unitName))相同造成混乱，RocketMQ会自动将instance设置为进程ID，避免不同进程的相互影响，但是同一个JVM中的不同消费者和不同生产者在
+        //启动时获取到的MQClientInstance实例都是同一个。MQClientInstance封装了RocketMQ网络处理API，是消息生产者，消息消费者与NameServer、Broker打交道的网络通道
         String clientId = clientConfig.buildMQClientId();
         MQClientInstance instance = this.factoryTable.get(clientId);
         if (null == instance) {

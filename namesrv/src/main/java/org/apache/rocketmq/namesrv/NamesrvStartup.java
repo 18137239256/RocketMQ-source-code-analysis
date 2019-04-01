@@ -143,6 +143,7 @@ public class NamesrvStartup {
             System.exit(-3);
         }
 
+        //注册JVM钩子函数并启动服务器，以便监听Broker，消息生产者的网络请求。一种优雅的关闭线程池的方式
         Runtime.getRuntime().addShutdownHook(new ShutdownHookThread(log, new Callable<Void>() {
             @Override
             public Void call() throws Exception {

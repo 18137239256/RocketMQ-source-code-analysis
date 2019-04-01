@@ -85,7 +85,7 @@ public class NamesrvController {
         this.registerProcessor();
 
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
-
+            //每隔10s扫描一次Broker，移除处于不激活状态的broker
             @Override
             public void run() {
                 NamesrvController.this.routeInfoManager.scanNotActiveBroker();
@@ -93,7 +93,7 @@ public class NamesrvController {
         }, 5, 10, TimeUnit.SECONDS);
 
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
-
+            //每隔10分钟打印一次KV配置
             @Override
             public void run() {
                 NamesrvController.this.kvConfigManager.printAllPeriodically();

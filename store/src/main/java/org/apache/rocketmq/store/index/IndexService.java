@@ -63,8 +63,10 @@ public class IndexService {
             for (File file : files) {
                 try {
                     IndexFile f = new IndexFile(file.getPath(), this.hashSlotNum, this.indexNum, 0, 0);
+                    //加载索引文件
                     f.load();
 
+                    //如果上次异常退出，而且索引文件上次刷盘时间小于该索引文件最大的消息时间戳，该文件立即销毁
                     if (!lastExitOK) {
                         if (f.getEndTimestamp() > this.defaultMessageStore.getStoreCheckpoint()
                             .getIndexMsgTimestamp()) {
@@ -199,6 +201,7 @@ public class IndexService {
     }
 
     public void buildIndex(DispatchRequest req) {
+        //获取或创建indexFile并获取所有文件最大的物理偏移量，如果物理偏移量小于索引文件中的物理偏移量，则说明是重复数据，忽略本次索引构建
         IndexFile indexFile = retryGetAndCreateIndexFile();
         if (indexFile != null) {
             long endPhyOffset = indexFile.getEndPhyOffset();
@@ -219,6 +222,7 @@ public class IndexService {
                     return;
             }
 
+            //如果消息的唯一键不为空，则添加到Hash索引中，以便加速根据唯一键检索消息
             if (req.getUniqKey() != null) {
                 indexFile = putKey(indexFile, msg, buildKey(topic, req.getUniqKey()));
                 if (indexFile == null) {
@@ -228,6 +232,7 @@ public class IndexService {
             }
 
             if (keys != null && keys.length() > 0) {
+                //为同一个消息建立多个索引
                 String[] keyset = keys.split(MessageConst.KEY_SEPARATOR);
                 for (int i = 0; i < keyset.length; i++) {
                     String key = keyset[i];
